@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers\Home;
 
+use Indonesia;
 use App\Models\Provinsi;
 use App\Models\Kecamatan;
 use App\Models\Pengaduan;
 use App\Models\DataPelapor;
+use App\Models\DataTerlapor;
 use App\Models\JenisPelapor;
+use Illuminate\Http\Request;
 use App\Models\KotaKabupaten;
 use App\Models\KategoriPelapor;
-use App\Models\DataTerlapor;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
@@ -26,8 +27,11 @@ class PengaduanController extends Controller
         $provinsi = Provinsi::all();
         $kota_kabupaten = KotaKabupaten::all();
         $kecamatan = Kecamatan::all();
+        $provinces = Indonesia::allProvinces();
+        $cities = Indonesia::allCities();
+        $districts = Indonesia::alldistricts();
 
-        return view('pages.landing-page.lapor.index', compact('kategori_pelapor', 'jenis_pelapor', 'provinsi', 'kota_kabupaten', 'kecamatan'));
+        return view('pages.landing-page.lapor.index', compact('kategori_pelapor', 'jenis_pelapor', 'provinsi', 'kota_kabupaten', 'kecamatan','provinces','cities','districts'));
     }
 
     public function store(Request $request)
@@ -57,9 +61,9 @@ class PengaduanController extends Controller
             'pekerjaan' => 'required|string',
             'pendidikan_terakhir' => 'required|string',
             'alamat_lengkap' => 'required|string',
-            'provinsi' => 'required|exists:provinsi,id',
-            'kota_kabupaten' => 'required|exists:kota_kabupaten,id',
-            'kecamatan' => 'required|exists:kecamatan,id',
+            'provinsi' => 'required|exists:indonesia_provinces,id',
+            'kota' => 'required|exists:indonesia_cities,id',
+            'kecamatan' => 'required|exists:indonesia_districts,id',
             'nomor_telepon' => 'required|string',
             'email' => 'required|email',
             'rahasia_data' => 'required|string',
@@ -67,13 +71,16 @@ class PengaduanController extends Controller
             'jabatan_terlapor' => 'required|string',
             'instansi_terlapor' => 'required|string',
             'alamat_lengkap' => 'required|string',
-            'provinsi' => 'required|exists:provinsi,id',
-            'kota_kabupaten' => 'required|exists:kota_kabupaten,id',
-            'kecamatan' => 'required|exists:kecamatan,id',
+            'provinsi_terlapor' => 'required|exists:indonesia_provinces,id',
+            'kota_terlapor' => 'required|exists:indonesia_cities,id',
+            'kecamatan_terlapor' => 'required|exists:indonesia_districts,id',
         ]);
 
         // Simpan data pelapor terlebih dahulu
         $dataPelapor = DataPelapor::create([
+            'provinces_id' => $request->provinsi,
+            'city_id' => $request->kota,
+            'district_id' => $request->kecamatan,
             'nama_pelapor' => $request->nama_pelapor,
             'warga_negara' => $request->warga_negara,
             'jenis_identitas' => $request->jenis_identitas,
@@ -85,9 +92,6 @@ class PengaduanController extends Controller
             'pekerjaan' => $request->pekerjaan,
             'pendidikan_terakhir' => $request->pendidikan_terakhir,
             'alamat_lengkap' => $request->alamat_lengkap,
-            'id_provinsi' => $request->provinsi,
-            'id_kota_kabupaten' => $request->kota_kabupaten,
-            'id_kecamatan' => $request->kecamatan,
             'nomor_telepon' => $request->nomor_telepon,
             'email' => $request->email,
             'rahasia_data' => $request->rahasia_data,
@@ -99,9 +103,9 @@ class PengaduanController extends Controller
         $file_uraian = $request->file('file_uraian') ? $request->file('file_uraian')->store('uraian') : null;
 
         $dataTerlapor = DataTerlapor::create([
-            'id_provinsi' => $request->provinsi,
-            'id_kota_kabupaten' => $request->kota_kabupaten,
-            'id_kecamatan' => $request->kecamatan,
+            'provinces_id' => $request->provinsi_terlapor,
+            'city_id' => $request->kota_terlapor,
+            'district_id' => $request->kecamatan_terlapor,
             'id_pelapor' => $dataPelapor->id,
             'nama_terlapor' => $request->nama_terlapor,
             'jabatan_terlapor' => $request->jabatan_terlapor,
@@ -132,6 +136,28 @@ class PengaduanController extends Controller
         // Redirect ke halaman setelah berhasil
         return redirect()->route('pengaduan.create')->with('success', 'Pengaduan berhasil dikirim!');
     }
+
+    public function provinces()
+    {
+        return \Indonesia::allProvinces();
+    }
+
+    public function cities(Request $request)
+    {
+        return \Indonesia::findProvince($request->id, ['cities'])->cities->pluck('name', 'id'); // Tetap gunakan id untuk mengisi dropdown
+    }
+
+
+    public function districts(Request $request)
+    {
+        return \Indonesia::findCity($request->id, ['districts'])->districts->pluck('name', 'id'); // Tetap gunakan id untuk mengisi dropdown
+    }
+
+    public function villages(Request $request)
+    {
+        return \Indonesia::findDistrict($request->id, ['villages'])->villages->pluck('name', 'id');
+    }
+
 
 
     public function getKotaKabupaten($provinsiId)

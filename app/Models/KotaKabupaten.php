@@ -9,9 +9,9 @@ class KotaKabupaten extends Model
 {
     use HasFactory;
 
-    protected $table = 'kota_kabupaten';
+    protected $table = 'indonesia_cities';
 
-    protected $fillable = ['id_provinsi', 'nama_kota_kabupaten'];
+    protected $guarded = [];
 
     public function provinsi()
     {

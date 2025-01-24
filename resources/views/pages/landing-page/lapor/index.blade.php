@@ -19,16 +19,6 @@
                         {{ session('success') }}
                     </div>
                 @endif
-                @if ($errors->any())
-                    <div class="alert alert-danger">
-                        <ul>
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-
         <div class="col-12 px-5">
             <div class="card mb-3 shadow-sm">
                 <div class="card-header bg-primary text-white">
@@ -37,6 +27,16 @@
                 <div class="card-body">
                     <form action="{{ route('pengaduan.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
+                        @if ($errors->any())
+                            <div class="alert alert-danger">
+                                <ul>
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+
                         <!-- Section 1 -->
                         <div id="section1">
                         <!-- Pertanyaan Awal -->
@@ -141,9 +141,12 @@
                                         </div>
                                         <div class="form-group">
                                             <label>Nomor Identitas</label>
-                                            <input type="text" class="form-control" name="nomor_identitas" 
+                                            <input type="number" class="form-control" id="nomorIdentitas" name="nomor_identitas" 
                                             required pattern="\d{16}" 
                                             title="Nomor identitas harus berisi 16 angka">
+                                            <small id="identitasFeedback" class="text-danger" style="display: none;">
+                                                Nomor identitas harus tepat 16 digit.
+                                            </small>
                                         </div>
                                         <div class="form-group">
                                             <label>Tempat Lahir </label>
@@ -189,31 +192,29 @@
                                             <label>Alamat Lengkap</label>
                                             <input type="text" class="form-control" name="alamat_lengkap" required>
                                         </div>
-                                        <div class="form-group">
-                                            <label class="card-title">Provinsi</label>
-                                            <select class="form-control" name="provinsi" id="provinsi" required>
-                                                <option value="">Pilih Provinsi</option>
-                                                @foreach ($provinsi as $prov)
-                                                    <option value="{{ $prov->id }}">{{ $prov->nama_provinsi }}</option>
-                                                @endforeach
+                                        <div class="form-group mt-4">
+                                            <label class="card-title col-md-3 col-form-label" for="provinsi">Provinsi</label>
+                                            <div class="col-md-9">
+                                                <select class="form-control" name="provinsi" id="provinsi_pelapor" required>
+                                                    <option value="">==Pilih Salah Satu==</option>
+                                                    @foreach ($provinces as $item)
+                                                    <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                                    @endforeach
+                                                </select>                                                                                          
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-group mt-4">
+                                            <label class="card-title col-md-3 col-form-label" for="kota">Kabupaten / Kota</label>
+                                            <select class="form-control" name="kota" id="kota_pelapor" required>
+                                                <option value="">==Pilih Salah Satu==</option>
                                             </select>
                                         </div>
+                                        
                                         <div class="form-group mt-4">
-                                            <label class="card-title">Kota / Kabupaten</label>
-                                            <select class="form-control" name="kota_kabupaten" required>
-                                                <option value="">Pilih Kabupaten</option>
-                                                @foreach ($kota_kabupaten as $kab)
-                                                    <option value="{{ $kab->id }}">{{ $kab->nama_kota_kabupaten }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="form-group mt-4">
-                                            <label class="card-title">Kecamatan</label>
-                                            <select class="form-control" name="kecamatan" required>
-                                                <option value="">Pilih Kecamatan</option>
-                                                @foreach ($kecamatan as $kec)
-                                                    <option value="{{ $kec->id }}">{{ $kec->nama_kecamatan }}</option>
-                                                @endforeach
+                                            <label class="card-title col-md-3 col-form-label" for="kecamatan">Kecamatan</label>
+                                            <select class="form-control" name="kecamatan" id="kecamatan_pelapor" required>
+                                                <option value="">==Pilih Salah Satu==</option>
                                             </select>
                                         </div>
                                         <div class="form-group">
@@ -261,46 +262,44 @@
                                             <input type="text" class="form-control" name="alamat_lengkap" placeholder="Alamat Lengkap" required>
                                         </div>
                                     
-                                        <div class="form-group">
-                                            <label class="card-title">Provinsi</label>
-                                            <select class="form-control" name="provinsi" id="provinsi_terlapor" required>
-                                                <option value="">Pilih Provinsi</option>
-                                                @foreach ($provinsi as $prov)
-                                                    <option value="{{ $prov->id }}">{{ $prov->nama_provinsi }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
                                         <div class="form-group mt-4">
-                                            <label class="card-title">Kota / Kabupaten</label>
-                                            <select class="form-control" name="kota_kabupaten" required>
-                                                <option value="">Pilih Kabupaten</option>
-                                                @foreach ($kota_kabupaten as $kab)
-                                                    <option value="{{ $kab->id }}">{{ $kab->nama_kota_kabupaten }}</option>
-                                                @endforeach
-                                            </select>
+                                            <label class="card-title col-md-3 col-form-label" for="provinsi">Provinsi</label>
+                                            <div class="col-md-9">
+                                                <select class="form-control" name="provinsi_terlapor" id="provinsi_terlapor" required>
+                                                    <option value="">==Pilih Salah Satu==</option>
+                                                    @foreach ($provinces as $item)
+                                                    <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                                    @endforeach
+                                                </select>                                                                                             
+                                            </div>
                                         </div>
+                                        
                                         <div class="form-group mt-4">
-                                            <label class="card-title">Kecamatan</label>
-                                            <select class="form-control" name="kecamatan" required>
-                                                <option value="">Pilih Kecamatan</option>
-                                                @foreach ($kecamatan as $kec)
-                                                    <option value="{{ $kec->id }}">{{ $kec->nama_kecamatan }}</option>
-                                                @endforeach
+                                            <label class="card-title col-md-3 col-form-label" for="kota">Kabupaten / Kota</label>
+                                            <select class="form-control" name="kota_terlapor" id="kota_terlapor" required>
+                                                <option value="">==Pilih Salah Satu==</option>
                                             </select>
                                         </div>
-                                    
+                                        
+                                        <div class="form-group mt-4">
+                                            <label class="card-title col-md-3 col-form-label" for="kecamatan">Kecamatan</label>
+                                            <select class="form-control" name="kecamatan_terlapor" id="kecamatan_terlapor" required>
+                                                <option value="">==Pilih Salah Satu==</option>
+                                            </select>
+                                        </div>
+                                        
                                         <div class="form-group mt-3">
                                             <div>
                                                 <input type="checkbox" name="setuju_syarat" required>
                                                 Dengan ini anda menyetujui <a href="#">Syarat Ketentuan</a> dan <a href="#">Kebijakan Privasi</a> pada Pengaduan Online
                                             </div>
                                         </div>
-                                    
+                                        
                                         <!-- Tombol Navigasi -->
                                         <div class="form-group text-center mt-4">
                                             <button type="button" class="btn btn-secondary" onclick="goToNextPage(2)">Kembali</button>
                                             <button type="submit" class="btn btn-primary">Submit</button>
-                                        </div>
+                                        </div>                                        
                                     </div>
         
                                                                 </form>
@@ -314,22 +313,79 @@
 @endsection
 
 @section('additional_scripts')
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
-    document.querySelector('select[name="provinsi"]').addEventListener('change', function() {
-  const provinsiId = this.value;
-  // Ambil data kota kabupaten dengan AJAX
-  fetch(`/get-kota-kabupaten/${provinsiId}`)
-    .then(response => response.json())
-    .then(data => {
-      const kotaKabupatenSelect = document.querySelector('select[name="kota_kabupaten"]');
-      kotaKabupatenSelect.innerHTML = '<option value="">Pilih Kota/Kabupaten</option>';
-      data.forEach(city => {
-        kotaKabupatenSelect.innerHTML += `<option value="${city.id}">${city.nama}</option>`;
-      });
-    });
-});
+    $(document).ready(function () {
+        console.log('jQuery Dimuat');
 
+        // Fungsi untuk memuat dropdown dinamis
+        function loadDropdown(url, id, targetElement, placeholder) {
+            $('#' + targetElement).empty().append('<option value="">Memuat data...</option>');
+
+            $.ajax({
+                url: url,
+                type: 'GET',
+                data: { id: id },
+                success: function (data) {
+                    $('#' + targetElement).empty().append('<option value="">' + placeholder + '</option>');
+                    if (data && Object.keys(data).length > 0) {
+                        $.each(data, function (key, value) {
+                            $('#' + targetElement).append('<option value="' + key + '">' + value + '</option>');
+                        });
+                    } else {
+                        $('#' + targetElement).append('<option value="">Tidak ada data</option>');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error AJAX:', error);
+                }
+            });
+        }
+
+        // Data Pelapor
+        $('#provinsi_pelapor').on('change', function () {
+            var provinsiId = $(this).val();
+            if (provinsiId) {
+                loadDropdown('{{ route("cities") }}', provinsiId, 'kota_pelapor', '==Pilih Kota==');
+                $('#kecamatan_pelapor').empty().append('<option value="">==Pilih Kecamatan==</option>');
+            } else {
+                $('#kota_pelapor').empty().append('<option value="">==Pilih Kota==</option>');
+                $('#kecamatan_pelapor').empty().append('<option value="">==Pilih Kecamatan==</option>');
+            }
+        });
+
+        $('#kota_pelapor').on('change', function () {
+            var kotaId = $(this).val();
+            if (kotaId) {
+                loadDropdown('{{ route("districts") }}', kotaId, 'kecamatan_pelapor', '==Pilih Kecamatan==');
+            } else {
+                $('#kecamatan_pelapor').empty().append('<option value="">==Pilih Kecamatan==</option>');
+            }
+        });
+
+        // Data Terlapor
+        $('#provinsi_terlapor').on('change', function () {
+            var provinsiId = $(this).val();
+            if (provinsiId) {
+                loadDropdown('{{ route("cities") }}', provinsiId, 'kota_terlapor', '==Pilih Kota==');
+                $('#kecamatan_terlapor').empty().append('<option value="">==Pilih Kecamatan==</option>');
+            } else {
+                $('#kota_terlapor').empty().append('<option value="">==Pilih Kota==</option>');
+                $('#kecamatan_terlapor').empty().append('<option value="">==Pilih Kecamatan==</option>');
+            }
+        });
+
+        $('#kota_terlapor').on('change', function () {
+            var kotaId = $(this).val();
+            if (kotaId) {
+                loadDropdown('{{ route("districts") }}', kotaId, 'kecamatan_terlapor', '==Pilih Kecamatan==');
+            } else {
+                $('#kecamatan_terlapor').empty().append('<option value="">==Pilih Kecamatan==</option>');
+            }
+        });
+    });
+</script>
+
+<script>
     // Menampilkan alert jika memilih "Belum"
     document.getElementById('sudahLaporBelum').addEventListener('change', function() {
         document.getElementById('alertBelum').classList.remove('d-none');
@@ -357,5 +413,17 @@
         console.error("Section tidak ditemukan. Pastikan ID section sudah benar.");
     }
 }
+</script>
+<script>
+    document.getElementById('nomorIdentitas').addEventListener('input', function () {
+        const input = this.value;
+        const feedback = document.getElementById('identitasFeedback');
+
+        if (input.length === 16 && /^\d+$/.test(input)) {
+            feedback.style.display = 'none'; // Sembunyikan pesan jika valid
+        } else {
+            feedback.style.display = 'block'; // Tampilkan pesan jika tidak valid
+        }
+    });
 </script>
 @endsection

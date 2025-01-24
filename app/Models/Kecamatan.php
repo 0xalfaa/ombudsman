@@ -9,13 +9,13 @@ class Kecamatan extends Model
 {
     use HasFactory;
 
-    protected $table = 'kecamatan';
+    protected $table = 'indonesia_districts';
 
-    protected $fillable = ['id_kota_kabupaten', 'nama_kecamatan'];
+    protected $guarded = [];
 
-    public function kotaKabupaten()
+    public function kabupatenKota()
     {
-        return $this->belongsTo(KotaKabupaten::class, 'id_kota_kabupaten');
+        return $this->belongsTo(KotaKabupaten::class,'city_code', 'code');
     }
 }
 

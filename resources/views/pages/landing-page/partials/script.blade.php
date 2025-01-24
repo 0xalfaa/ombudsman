@@ -4,7 +4,6 @@
 <script src="{{ asset('assets/compiled/js/app.js') }}"></script>
 <script src="{{ asset('assets/extensions/apexcharts/apexcharts.min.js') }}"></script>
 <script src="{{ asset('assets/extensions/apexcharts/apexcharts.min.js') }}"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 @if (!Route::is('login'))
     @vite('resources/js/navbar.js')
 @endif

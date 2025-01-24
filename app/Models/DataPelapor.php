@@ -15,6 +15,9 @@ class DataPelapor extends Model
         'id_provinsi',
         'id_kota_kabupaten',
         'id_kecamatan',
+        'provinces_id',
+        'city_id',
+        'district_id',
         'nama_pelapor',
         'warga_negara',
         'jenis_identitas',
@@ -36,20 +39,20 @@ class DataPelapor extends Model
                 return $this->belongsTo(KategoriPelapor::class, 'id_kategori_pelapor');
             }
 
-    public function provinsi()
+            public function provinsi()
             {
-                return $this->belongsTo(Provinsi::class, 'id_provinsi');
+                return $this->belongsTo(Provinsi::class, 'provinces_id', 'id');
             }
 
-    public function kecamatan()
+            public function kecamatan()
             {
-                return $this->belongsTo(Kecamatan::class, 'id_kecamatan');
+                return $this->belongsTo(Kecamatan::class, 'city_id', 'id');
             }
 
-    public function kabupaten()
-            {
-                return $this->belongsTo(Kotakabupaten::class, 'id_kecamatan');
-            }
+            public function kabupatenKota()
+                    {
+                        return $this->belongsTo(KotaKabupaten::class, 'provinces_id', 'id');
+                    }
 
     public function jenisPelapor()
             {

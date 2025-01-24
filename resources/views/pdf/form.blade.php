@@ -146,6 +146,7 @@
 
     <table class="content">
         <!-- Data Pelapor -->
+        <table class="data_pelapor">
         <tr>
             <td class="label">1. Nama Pelapor</td>
             <td class="value"><span class="dots">:</span> {{ $record->pelapor->nama_pelapor }}</td>
@@ -212,6 +213,7 @@
                 <label for="laporan_tidak_ombudsman">Tidak</label>
             </td>
         </tr>
+        </table>
 
         <!-- Tabel Kronologi Kejadian -->
         <tr>
@@ -219,7 +221,7 @@
         </tr>
 
         <!-- Looping untuk kronologi kejadian -->
-        <table class="kronologi-table" style="width:700px">
+        <table class="kronologi-table" style="width:700px; table-layout: fixed; border-collapse: collapse;">
             <thead>
                 <tr>
                     <th class="tanggal-kronologi">Tanggal Kejadian</th>

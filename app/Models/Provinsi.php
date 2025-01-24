@@ -9,11 +9,11 @@ class Provinsi extends Model
 {
     use HasFactory;
 
-    protected $table = 'provinsi';
+    protected $table = 'indonesia_provinces';
     
-    protected $fillable = ['nama_provinsi'];
+    protected $guarded = [];
 
-    public function kotaKabupaten()
+    public function kabupatenKota()
     {
         return $this->hasMany(KotaKabupaten::class, 'id_provinsi');
     }

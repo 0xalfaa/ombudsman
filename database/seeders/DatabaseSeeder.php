@@ -5,6 +5,10 @@ namespace Database\Seeders;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Artisan;
+use Laravolt\Indonesia\Seeds\CitiesSeeder;
+use Laravolt\Indonesia\Seeds\VillagesSeeder;
+use Laravolt\Indonesia\Seeds\DistrictsSeeder;
+use Laravolt\Indonesia\Seeds\ProvincesSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -14,10 +18,15 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            RolesAndPermissionsSeeder::class,
-            UsersTableSeeder::class,
+            ProvincesSeeder::class,
+            CitiesSeeder::class,
+            DistrictsSeeder::class,
+            // VillagesSeeder::class,
+            // RolesAndPermissionsSeeder::class,
+            // UsersTableSeeder::class,
+
         ]);
 
-        Artisan::call('shield:generate --all');
+        // Artisan::call('shield:generate --all');
     }
 }

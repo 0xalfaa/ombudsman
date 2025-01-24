@@ -14,9 +14,9 @@ class DataTerlapor extends Model
     protected $fillable = [
         'id_kelompok_instansi',
         'id_klasifikasi_instansi',
-        'id_provinsi',
-        'id_kota_kabupaten',
-        'id_kecamatan',
+        'provinces_id',
+        'city_id',
+        'district_id',
         'id_pelapor',
         'nama_terlapor',
         'jabatan_terlapor',
@@ -45,17 +45,17 @@ class DataTerlapor extends Model
     }
 
     public function provinsi()
-            {
-                return $this->belongsTo(Provinsi::class, 'id_provinsi');
-            }
+    {
+        return $this->belongsTo(Provinsi::class, 'provinces_id', 'id');
+    }
 
     public function kecamatan()
-            {
-                return $this->belongsTo(Kecamatan::class, 'id_kecamatan');
-            }
+    {
+        return $this->belongsTo(Kecamatan::class, 'city_id', 'id');
+    }
 
-    public function kabupaten()
+    public function kabupatenKota()
             {
-                return $this->belongsTo(Kotakabupaten::class, 'id_kecamatan');
+                return $this->belongsTo(KotaKabupaten::class, 'provinces_id', 'id');
             }
 }

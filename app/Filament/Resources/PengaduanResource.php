@@ -29,6 +29,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Forms\Components\Wizard\Step;
 use App\Filament\Resources\PengaduanResource\Pages;
 use Joaopaulolndev\FilamentPdfViewer\Forms\Components\PdfViewerField;
@@ -98,53 +99,30 @@ class PengaduanResource extends Resource
                             TextInput::make('warga_negara')
                                 ->label('Warga Negara')
                                 ->required(),
-                            Select::make('id_provinsi')
+                                Select::make('provinces_id')
                                 ->label('Provinsi')
-                                ->relationship('provinsi', 'nama_provinsi')
+                                ->relationship('provinsi', 'name') // Relasi ke model Provinsi
                                 ->live()
                                 ->required()
                                 ->placeholder('Pilih Provinsi')
-                                ->reactive() // Agar bisa memperbarui data secara dinamis
+                                ->reactive() // Agar pilihan dinamis
                                 ->afterStateUpdated(function ($set) {
-                                    // Reset kota dan kecamatan ketika provinsi diubah
-                                    $set('id_kota_kabupaten', null);
-                                    $set('id_kecamatan', null);
+                                    $set('city_id', null); // Reset kabupaten/kota
+                                    $set('district_id', null); // Reset kecamatan
                                 }),
                             
-                            Select::make('id_kota_kabupaten')
+                                Select::make('city_id')
                                 ->label('Kabupaten/Kota')
-                                ->relationship('kabupaten', 'nama_kota_kabupaten')
+                                ->relationship('kabupatenKota', 'name')
                                 ->required()
                                 ->placeholder('Pilih Kota / Kabupaten')
-                                ->reactive() // Agar pilihan kota kabupaten dinamis mengikuti provinsi
-                                ->options(function (callable $get) {
-                                    $provinsiId = $get('id_provinsi');
-                                    if (!$provinsiId) {
-                                        return [];
-                                    }
-                                    return \App\Models\KotaKabupaten::where('id_provinsi', $provinsiId)
-                                        ->pluck('nama_kota_kabupaten', 'id');
-                                })
-                                ->afterStateUpdated(function ($set) {
-                                    // Reset kecamatan ketika kota/kabupaten diubah
-                                    $set('id_kecamatan', null);
-                                }),
-                            
-                            Select::make('id_kecamatan')
+                                ->reactive(),
+                                Select::make('district_id')
                                 ->label('Kecamatan')
-                                ->relationship('kecamatan', 'nama_kecamatan')
+                                ->relationship('kecamatan', 'name')
                                 ->required()
                                 ->placeholder('Pilih Kecamatan')
-                                ->reactive() // Agar pilihan kecamatan dinamis mengikuti kota kabupaten
-                                ->options(function (callable $get) {
-                                    $kabupatenId = $get('id_kota_kabupaten');
-                                    if (!$kabupatenId) {
-                                        return [];
-                                    }
-                                    return \App\Models\Kecamatan::where('id_kota_kabupaten', $kabupatenId)
-                                        ->pluck('nama_kecamatan', 'id');
-                                }),
-                            
+                                ->reactive(),                                                      
                             Select::make('rahasia_data')
                                 ->label('Rahasia Data')
                                 ->options([
@@ -162,6 +140,12 @@ class PengaduanResource extends Resource
                         ->icon('mdi-folder-information')
                         ->schema([
                             Section::make([
+                                select::make('sudah_lapor')
+                                ->label('Sudah Lapor')
+                                ->options([
+                                    'Ya' => 'Ya',
+                                    'Belum' => 'Belum',
+                                ]),
                                 Select::make('id_kategori_pelapor')
                                 ->label('Kategori Pelapor')
                                 ->relationship('KategoriPelapor')
@@ -262,52 +246,24 @@ class PengaduanResource extends Resource
                                 ->required()
                                 ->maxLength(250)
                                 ->placeholder('Alamat Lengkap'),
-                                Select::make('id_provinsi')
+                                Select::make('provinces_id')
                                 ->label('Provinsi')
-                                ->relationship('provinsi', 'nama_provinsi')
+                                ->relationship('provinsi', 'name') // Relasi ke model Provinsi
                                 ->live()
                                 ->required()
                                 ->placeholder('Pilih Provinsi')
-                                ->reactive() // Agar bisa memperbarui data secara dinamis
-                                ->afterStateUpdated(function ($set) {
-                                    // Reset kota dan kecamatan ketika provinsi diubah
-                                    $set('id_kota_kabupaten', null);
-                                    $set('id_kecamatan', null);
-                                }),
-                            
-                            Select::make('id_kota_kabupaten')
+                                ->reactive(),
+                                Select::make('city_id')
                                 ->label('Kabupaten/Kota')
-                                ->relationship('kabupaten', 'nama_kota_kabupaten')
+                                ->relationship('kabupatenKota', 'name')
                                 ->required()
-                                ->placeholder('Pilih Kota / Kabupaten')
-                                ->reactive() // Agar pilihan kota kabupaten dinamis mengikuti provinsi
-                                ->options(function (callable $get) {
-                                    $provinsiId = $get('id_provinsi');
-                                    if (!$provinsiId) {
-                                        return [];
-                                    }
-                                    return \App\Models\KotaKabupaten::where('id_provinsi', $provinsiId)
-                                        ->pluck('nama_kota_kabupaten', 'id');
-                                })
-                                ->afterStateUpdated(function ($set) {
-                                    // Reset kecamatan ketika kota/kabupaten diubah
-                                    $set('id_kecamatan', null);
-                                }),
-                            
-                            Select::make('id_kecamatan')
+                                ->reactive(),
+                                Select::make('district_id')
                                 ->label('Kecamatan')
-                                ->relationship('kecamatan', 'nama_kecamatan')
+                                ->relationship('kecamatan', 'name') // Relasi ke model Kecamatan
                                 ->required()
                                 ->placeholder('Pilih Kecamatan')
-                                ->reactive() // Agar pilihan kecamatan dinamis mengikuti kota kabupaten
-                                ->options(function (callable $get) {
-                                    $kabupatenId = $get('id_kota_kabupaten');
-                                    if (!$kabupatenId) {
-                                        return [];
-                                    }
-                                    return \App\Models\Kecamatan::where('id_kota_kabupaten', $kabupatenId)
-                                        ->pluck('nama_kecamatan', 'id');
-                                }),
+                                ->reactive(), // Pilihan dinamis mengikuti kota/kabupaten
                                 ]) 
                                 ->relationship('terlapor'),
                         ]),
@@ -322,15 +278,12 @@ class PengaduanResource extends Resource
                                             ->schema([
                                                 Textarea::make('deskripsi_kronologi')
                                                     ->label('Deskripsi Kronologi')
-                                                    ->placeholder('Tuliskan kronologi kejadian')
-                                                    ->required(),
+                                                    ->placeholder('Tuliskan kronologi kejadian'),
                                                     DatePicker::make('tanggal_kronologi')
-                                                    ->label('Tanggal Kejadian')
-                                                    ->required(),
+                                                    ->label('Tanggal Kejadian'),
                                                     Textarea::make('catatan_bukti')
                                                         ->label('Catatan Bukti')
-                                                        ->placeholder('Keterangan Bukti')
-                                                        ->required(),
+                                                        ->placeholder('Keterangan Bukti'),
                                             ])
                                             ->maxItems(10) // Maksimum 10 item
                                     ])
@@ -363,7 +316,15 @@ class PengaduanResource extends Resource
                     ->sortable()
                     ->date(),
             ])
-            ->filters([])
+            ->filters([
+
+                    SelectFilter::make('sudah_lapor')
+                    ->options([
+                        'Ya' => 'Ya',
+                        'Belum' => 'Belum',
+                    ])
+                    
+            ])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\Action::make('pdf')

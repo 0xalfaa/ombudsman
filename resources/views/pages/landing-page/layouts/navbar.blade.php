@@ -38,7 +38,7 @@
                             </li>
                             <li><hr class="dropdown-divider" /></li>
                             <li>
-                                <form action="/logout" method="post">
+                                <form action="/admin/logout" method="post">
                                     @csrf
                                     <button type="submit" class="dropdown-item"><i class="bi bi-box-arrow-left me-1"></i> Keluar</button>
                                 </form>

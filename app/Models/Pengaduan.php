@@ -18,6 +18,7 @@ class Pengaduan extends Model
         'id_kategori_pelapor',
         'id_jenis_pelapor',
         'id_terlapor',
+        'sudah_lapor',
         'file_identitas',
         'file_bukti',
         'file_uraian',

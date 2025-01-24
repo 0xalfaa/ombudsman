@@ -40,6 +40,7 @@
         "laravel/framework": "^11.9",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.8",
+        "laravolt/indonesia": "^0.35.0",
         "league/commonmark": "^2.4",
         "opcodesio/log-viewer": "^3.11",
         "postare/blade-mdi": "^1.1",
