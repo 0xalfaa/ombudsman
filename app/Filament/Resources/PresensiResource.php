@@ -7,7 +7,10 @@ use Filament\Tables;
 use App\Models\Presensi;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
+use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Tables\Columns\TextColumn;
@@ -15,7 +18,11 @@ use Filament\Tables\Columns\ImageColumn;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TimePicker;
+use Filament\Tables\Actions\ExportAction;
+use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Exports\PresensiExporter;
+use Filament\Tables\Actions\ExportBulkAction;
 use App\Filament\Resources\PresensiResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\PresensiResource\RelationManagers;
@@ -37,12 +44,13 @@ class PresensiResource extends Resource
                 ->required(),
                 DatePicker::make('tanggal')
                 ->label('Tanggal')
-                ->default(now()->toDateString()),
+                ->default(now()->toDateString())
+                ->readOnly(),
                  // Tidak dapat diubah oleh user
                 TimePicker::make('waktu_masuk')
                     ->label('Waktu Masuk')
                     ->default(now()->toTimeString())
-                    ->disabled(),
+                    ->readOnly(),
                      // Otomatis terisi
                 TimePicker::make('waktu_keluar')
                     ->label('Waktu Keluar')
@@ -85,15 +93,80 @@ class PresensiResource extends Resource
                 ->size(70),
             ])
             ->filters([
-                //
+                SelectFilter::make('user_id')
+                ->label('Filter Nama')
+                ->relationship('NamaMagang', 'username'),
+                SelectFilter::make('created_at')
+            ->form([
+                Select::make('bulan')
+                    ->label('Filter Berdasarkan Bulan')
+                    ->options([
+                        '01' => 'Januari',
+                        '02' => 'Februari',
+                        '03' => 'Maret',
+                        '04' => 'April',
+                        '05' => 'Mei',
+                        '06' => 'Juni',
+                        '07' => 'Juli',
+                        '08' => 'Agustus',
+                        '09' => 'September',
+                        '10' => 'Oktober',
+                        '11' => 'November',
+                        '12' => 'Desember',
+                    ])
+                    ->placeholder('Pilih Bulan'),
+            ])
+            ->query(function (Builder $query, array $data): Builder {
+                if (isset($data['bulan'])) {
+                    return $query->whereMonth('created_at', $data['bulan']);
+                }
+
+                return $query;
+            }),
+                
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+            ])
+            ->headerActions ([
+                ExportAction::make()
+                ->exporter(PresensiExporter::Class)
+                ->label('Export Presensi'),
+                Action::make('export_pdf')
+                ->label('Export Presensi Anda')
+                ->color('success')
+                ->icon('heroicon-s-arrow-down-tray')
+                ->action(function () {
+                    $user = Auth::user(); // Ambil user yang sedang login
+
+                    if (!$user) {
+                        throw new \Exception("User tidak ditemukan atau belum login.");
+                    }
+
+                    $presensi = $user->presensi; // Ambil data presensi dari user login
+
+                    if ($presensi->isEmpty()) {
+                        throw new \Exception("Tidak ada data presensi yang tersedia.");
+                    }
+
+                    $pdf = Pdf::loadView('pdf.presensi', compact('user', 'presensi'))
+                        ->setPaper('A4', 'portrait');
+
+                    return response()->streamDownload(
+                        fn () => print($pdf->output()),
+                        'Presensi-' . $user->nama . '.pdf',
+                        ['Content-Type' => 'application/pdf']
+                    );
+                })
+
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
+                ExportBulkAction::make()
+                ->exporter(PresensiExporter::Class)
+                ->label('Export Presensi'),
             ]);
     }
 

@@ -45,6 +45,7 @@ class UserResource extends Resource
                             ->avatar()
                             ->collection('avatars')
                             ->alignCenter()
+                            ->required()
                             ->columnSpanFull(),
 
                         Forms\Components\Actions::make([

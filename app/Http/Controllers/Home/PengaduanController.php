@@ -97,10 +97,6 @@ class PengaduanController extends Controller
             'rahasia_data' => $request->rahasia_data,
         ]);
 
-        // Upload file dan simpan path-nya
-        $file_bukti = $request->file('file_bukti') ? $request->file('file_bukti')->store('bukti') : null;
-        $file_identitas = $request->file('file_identitas')->store('identitas');
-        $file_uraian = $request->file('file_uraian') ? $request->file('file_uraian')->store('uraian') : null;
 
         $dataTerlapor = DataTerlapor::create([
             'provinces_id' => $request->provinsi_terlapor,
@@ -114,22 +110,29 @@ class PengaduanController extends Controller
 
         ]);
 
-        // Simpan data pengaduan
-        Pengaduan::create([
-            'sudah_lapor' => $request->sudah_lapor,
-            'id_pelapor' => $dataPelapor->id,
-            'id_terlapor' => $dataTerlapor->id,
-            'id_kategori_pelapor' => $request->kategori_pelapor,
-            'id_jenis_pelapor' => $request->jenis_pelapor,
-            'file_bukti' => $file_bukti,
-            'file_identitas' => $file_identitas,
-            'file_uraian' => $file_uraian,
-            'tanggal_upaya' => $request->tanggal_upaya,
-            'bukti_upaya' => $request->bukti_upaya,
-            'perihal' => $request->perihal,
-            'harapan_pelapor' => $request->harapan_pelapor,
-        ]);
-
+        // Upload file dan simpan path-nya
+        try {
+            $file_bukti = $request->file('file_bukti') ? $request->file('file_bukti')->store('bukti') : null;
+            $file_identitas = $request->file('file_identitas')->store('identitas');
+            $file_uraian = $request->file('file_uraian') ? $request->file('file_uraian')->store('uraian') : null;
+        
+            Pengaduan::create([
+                'sudah_lapor' => $request->sudah_lapor,
+                'id_pelapor' => $dataPelapor->id,
+                'id_terlapor' => $dataTerlapor->id,
+                'id_kategori_pelapor' => $request->kategori_pelapor,
+                'id_jenis_pelapor' => $request->jenis_pelapor,
+                'file_bukti' => $file_bukti,
+                'file_identitas' => $file_identitas,
+                'file_uraian' => $file_uraian,
+                'tanggal_upaya' => $request->tanggal_upaya,
+                'bukti_upaya' => $request->bukti_upaya,
+                'perihal' => $request->perihal,
+                'harapan_pelapor' => $request->harapan_pelapor,
+            ]);
+        } catch (\Exception $e) {
+            return back()->withErrors(['msg' => 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage()]);
+        }
         
     
 

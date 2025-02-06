@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\ApiController;
 use App\Http\Controllers\SaranController;
+use App\Http\Controllers\PresensiController;
 use App\Http\Controllers\Home\{
     HomeController as Home,
     AboutController as HomeAbout,
@@ -28,4 +29,6 @@ Route::get('/villages', [PengaduanController::class, 'villages'])->name('village
 Route::get('/berita', [BeritaController::class, 'index'])->name('berita.index');
 Route::get('/berita/{id}', [BeritaController::class, 'show'])->name('berita.show');
 Route::post('/saran', [SaranController::class, 'store'])->name('saran.store');
+Route::get('/presensi/print/{user}', [PresensiController::class, 'printPresensi'])
+     ->name('presensi.print');
 

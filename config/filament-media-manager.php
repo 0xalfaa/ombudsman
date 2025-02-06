@@ -7,7 +7,7 @@ return [
     ],
 
     "api" => [
-        "active" => false,
+        "active" => true,
         "middlewares" => [
             "api",
             "auth:sanctum"
