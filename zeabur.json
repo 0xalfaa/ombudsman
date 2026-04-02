@@ -1,0 +1,8 @@
+{
+  "build": {
+    "command": "composer install --no-dev --optimize-autoloader && npm install && npm run build"
+  },
+  "start": {
+    "command": "sh deploy.sh"
+  }
+}
